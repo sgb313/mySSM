@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+
+    <!--    扫描controller和service包-->
+<context:component-scan base-package="com.sgb.controller"></context:component-scan>
+<context:component-scan base-package="com.sgb.service"></context:component-scan>
+
+<!--    开启注解-->
+<mvc:annotation-driven></mvc:annotation-driven>
+<!--扫描静态资源-->
+<mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="prefix" value="/WEB-INF/pages/"></property>
+    <property name="suffix" value=".jsp"></property>
+</bean>
+
+<!--拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--            指定的拦截某个方法-->
+            <mvc:mapping path="/register"/>
+            <bean class="com.sgb.controller.isNullInterceptor"></bean>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/login"/>
+            <bean class="com.sgb.controller.confirmPassword"></bean>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/toSuccess"/>
+            <bean class="com.sgb.controller.toSuccessInterceptor"></bean>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/toLogin"/>
+            <bean class="com.sgb.controller.isLoginInterceptor"></bean>
+        </mvc:interceptor>
+<!--       用于国际化的拦截器-->
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" id="interceptor"></bean>
+    </mvc:interceptors>
+
+
+<!--    国际化-->
+    <bean class="org.springframework.web.servlet.i18n.SessionLocaleResolver" id="localeResolver"></bean>
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+      <property name="basenames">
+          <list>
+              <value>registerPage.register</value>
+              <value>indexPage.index</value>
+          </list>
+      </property>
+    </bean>
+
+    <!--文件上上传解析器-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="#{1024*1024*20}"/>
+        <property name="defaultEncoding" value="utf-8"></property>
+    </bean>
+
+</beans>
